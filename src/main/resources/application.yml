@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: digiteen-user-service
+  datasource:
+    # Local default: PostgreSQL exposed by docker compose on the host.
+    # Docker/production override this value through DB_URL.
+    url: ${DB_URL:jdbc:postgresql://127.0.0.1:5432/digiteen_users}
+    username: ${DB_USERNAME:digiteen}
+    password: ${DB_PASSWORD:digiteen_dev_password}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+
+server:
+  port: ${SERVER_PORT:8080}
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+
+security:
+  jwt:
+    issuer: ${JWT_ISSUER:https://identity.digiteen.local}
+    audience: ${JWT_AUDIENCE:digiteen-wallet-service}
+    local-audience: ${JWT_LOCAL_AUDIENCE:digiteen-user-service}
+    access-token-ttl: ${JWT_ACCESS_TTL:PT15M}
+    refresh-token-ttl: ${JWT_REFRESH_TTL:P7D}
+    private-key: ${JWT_PRIVATE_KEY:file:./keys/private.pem}
+    public-key: ${JWT_PUBLIC_KEY:file:./keys/public.pem}
+    auto-generate-keys: ${JWT_AUTO_GENERATE_KEYS:true}
+
+logging:
+  structured:
+    format:
+      console: logstash
+  level:
+    root: INFO
+    com.digiteen.userservice: INFO
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+    display-request-duration: true
