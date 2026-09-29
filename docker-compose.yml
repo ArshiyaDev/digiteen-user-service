@@ -16,5 +16,30 @@ services:
       retries: 20
     restart: unless-stopped
 
+  user-service:
+    build:
+      context: .
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-digiteen_users}
+      DB_USERNAME: ${POSTGRES_USER:-digiteen}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-digiteen_dev_password}
+      JWT_ISSUER: ${JWT_ISSUER:-https://identity.digiteen.local}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-digiteen-wallet-service}
+      JWT_LOCAL_AUDIENCE: ${JWT_LOCAL_AUDIENCE:-digiteen-user-service}
+      JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-PT15M}
+      JWT_REFRESH_TTL: ${JWT_REFRESH_TTL:-P7D}
+      JWT_PRIVATE_KEY: file:/app/keys/private.pem
+      JWT_PUBLIC_KEY: file:/app/keys/public.pem
+      JWT_AUTO_GENERATE_KEYS: "true"
+    ports:
+      - "${USER_SERVICE_PORT:-8080}:8080"
+    volumes:
+      - user_jwt_keys:/app/keys
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
 volumes:
   user_postgres_data:
+  user_jwt_keys:

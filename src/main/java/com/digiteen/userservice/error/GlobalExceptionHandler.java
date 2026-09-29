@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -41,6 +42,12 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiError> handleConflict(DataIntegrityViolationException exception) {
         return response(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS",
                 "A user with the supplied email or phone already exists", Map.of());
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    ResponseEntity<ApiError> handleOptimisticLock(ObjectOptimisticLockingFailureException exception) {
+        return response(HttpStatus.CONFLICT, "CONCURRENT_MODIFICATION",
+                "The resource was modified by another request; retry with the latest state", Map.of());
     }
 
     @ExceptionHandler(Exception.class)
