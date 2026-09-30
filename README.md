@@ -1,44 +1,18 @@
 # Digiteen User Service
 
-## Run with Docker
+Requires Docker Compose. From this repository, start the app and PostgreSQL:
 
 ```bash
-docker compose up -d --build
+docker compose up -d --build --wait
 ```
 
-Check:
+Swagger: http://localhost:8080/swagger-ui.html
 
-```bash
-docker compose ps
-curl http://localhost:8080/actuator/health
-```
+Register/login to get an `accessToken`; paste it into Wallet Swagger → **Authorize**.
+Unit tests run during the build.
 
-Swagger:
-
-```text
-http://localhost:8080/swagger-ui.html
-```
-
-In Swagger, call `POST /api/v1/auth/register`, copy `accessToken`, click
-**Authorize**, and paste the token.
-
-## Test
-
-Tests run automatically during the Docker build. Run them again with:
-
-```bash
-docker compose build user-service
-```
-
-## Stop
+Stop (keeps data):
 
 ```bash
 docker compose down
-```
-
-Delete all local data and start clean:
-
-```bash
-docker compose down --volumes
-docker compose up -d --build
 ```
